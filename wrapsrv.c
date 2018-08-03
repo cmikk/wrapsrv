@@ -239,6 +239,7 @@ parse_answer_section(ns_msg *msg) {
 	uint16_t prio, weight, port, len;
 	const unsigned char *rdata;
 	char *tname;
+	unsigned char tbuf[NS_MAXDNAME];
 
 	rrmax = ns_msg_count(*msg, ns_s_an);
 	for (rrnum = 0; rrnum < rrmax; rrnum++) {
@@ -254,7 +255,9 @@ parse_answer_section(ns_msg *msg) {
 				NS_GET16(weight, rdata);
 				NS_GET16(port, rdata);
 				len -= 3U * NS_INT16SZ;
-				tname = target_name(rdata);
+				ns_name_unpack(ns_msg_base(*msg), ns_msg_end(*msg),
+						rdata, tbuf, sizeof(tbuf));
+				tname = target_name(tbuf);
 				insert_tuple(tname, prio, weight, port);
 			}
 		}
